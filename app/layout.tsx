@@ -5,6 +5,9 @@ import { Inter } from 'next/font/google';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Github } from 'lucide-react';
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from 'uploadthing/server';
+import { ourFileRouter } from './api/uploadthing/core';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,6 +29,15 @@ export default function RootLayout({
           'flex flex-col h-screen max-h-screen overflow-hidden'
         )}
       >
+        <NextSSRPlugin
+          /**
+           * The `extractRouterConfig` will extract **only** the route configs
+           * from the router to prevent additional information from being
+           * leaked to the client. The data passed to the client is the same
+           * as if you were to fetch `/api/uploadthing` directly.
+           */
+          routerConfig={extractRouterConfig(ourFileRouter)}
+        />
         <div className='px-6 py-3 flex items-center h-fit justify-between border-b overflow-hidden'>
           <h1 className='text-xl font-bold'>upload.ai</h1>
           <div className='flex items-center gap-3'>

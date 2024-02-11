@@ -1,7 +1,7 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -12,9 +12,29 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
-import { FileVideo, Upload, Wand2 } from 'lucide-react';
+import { useUploadThing } from '@/utils/uploadthing';
+import { FileVideo, Loader, Upload, Wand2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Home() {
+  const [files, setFiles] = useState<File[]>([]);
+
+  const { startUpload, permittedFileInfo, isUploading } = useUploadThing(
+    'videoUploader',
+    {
+      onClientUploadComplete: (res) => {
+        console.log(">>>  ~ Home ~ res:", res)
+        alert('uploaded successfully!');
+      },
+      onUploadError: (e) => {
+        alert('error occurred while uploading');
+        console.error(e);
+      },
+      onUploadBegin: () => {
+        alert('upload has begun');
+      },
+    }
+  );
   return (
     <main className='flex flex-1 h-full gap-6 overflow-hidden'>
       <div className='flex flex-1 flex-col p-6 pr-0 gap-4'>
@@ -50,8 +70,10 @@ export default function Home() {
             type='file'
             id='video'
             accept='video/mp4'
-            className='sr-only '
+            className='sr-only'
+            onChange={(e) => setFiles(Array.from(e.target.files || []))}
           />
+
           <Separator />
 
           <div className='flex flex-col gap-y-2'>
@@ -62,8 +84,25 @@ export default function Home() {
               placeholder='Add keywords mentioned in the video. Must be comma separated...'
             />
           </div>
-          <Button type='submit' className='w-full'>
-            <Upload className='w-4 h-4 ml-2' /> Send video
+          <Button
+            type='submit'
+            className='w-full'
+            disabled={isUploading || files.length <= 0}
+            onClick={(ev) => {
+              ev.preventDefault();
+              startUpload(files);
+            }}
+          >
+            {isUploading ? (
+              <>
+                <Loader className='w-4 h-4 mr-2 animate-spin animate' />{' '}
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload className='w-4 h-4 mr-2' /> Send video
+              </>
+            )}
           </Button>
         </form>
         <Separator />
