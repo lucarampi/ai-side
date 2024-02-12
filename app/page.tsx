@@ -23,15 +23,16 @@ export default function Home() {
     'videoUploader',
     {
       onClientUploadComplete: (res) => {
-        console.log(">>>  ~ Home ~ res:", res)
+        console.log('>>>  ~ Home ~ res:', res);
+
         alert('uploaded successfully!');
       },
       onUploadError: (e) => {
         alert('error occurred while uploading');
-        console.error(e);
       },
-      onUploadBegin: () => {
-        alert('upload has begun');
+      onUploadBegin: () => {},
+      onBeforeUploadBegin: (filed) => {
+        return files;
       },
     }
   );
@@ -69,7 +70,7 @@ export default function Home() {
           <Input
             type='file'
             id='video'
-            accept='video/mp4'
+            accept='audio/*'
             className='sr-only'
             onChange={(e) => setFiles(Array.from(e.target.files || []))}
           />
